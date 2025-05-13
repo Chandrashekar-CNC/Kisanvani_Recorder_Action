@@ -38,3 +38,5 @@ jobs:
         access_key: ${{ secrets.access_key }}
         secret_key: ${{ secrets.secret_key }}
       timeout-minutes: 80  # Set a timeout of 15 minutes for this step
+    - run: echo "🎉 The job was automatically triggered by a ${{ github.event_name }} event."
+    
