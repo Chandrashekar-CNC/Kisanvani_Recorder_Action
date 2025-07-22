@@ -255,7 +255,8 @@ def ffmpegRecord(rec,hh,mm,archive):
     value = mids.pop(city[rec][4], 'not found') # if key  does not exist, so 'not found' is returned
     #---------------
 
-    if(rTime <= 0):
+    #if(rTime <= 0):
+    if(rTime <= -500):
         #print("\nNegative Seconds \nExit\n")
         log += "\n\nNegative Seconds\n\nExit\n"
         msg += "\n\nNegative Seconds\nExit\n"
