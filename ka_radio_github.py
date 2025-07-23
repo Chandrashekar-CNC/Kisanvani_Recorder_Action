@@ -255,8 +255,7 @@ def ffmpegRecord(rec,hh,mm,archive):
     value = mids.pop(city[rec][4], 'not found') # if key  does not exist, so 'not found' is returned
     #---------------
 
-    #if(rTime <= 0):
-    if(rTime <= -500):
+    if(rTime <= 0):
         #print("\nNegative Seconds \nExit\n")
         log += "\n\nNegative Seconds\n\nExit\n"
         msg += "\n\nNegative Seconds\nExit\n"
@@ -458,7 +457,7 @@ def waitUntil(hh,mm):
     msg += "\nPresent Timestamp = "+str(s_stamp)
 
     diff = e_stamp-s_stamp
-    if (diff >= 0):
+    if (diff >= -500):
         print("Sleeping For [",e_stamp-s_stamp,"] Seconds")
         msg += "\n\nSleeping For [ "+str(e_stamp-s_stamp)+" ] Seconds..."
 
