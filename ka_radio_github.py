@@ -468,6 +468,8 @@ def waitUntil(hh,mm):
         m_id = mids['waitUntil']
         #---------------
 
+        if (diff >= -500):
+            diff = 1
         time.sleep(diff)
         print("Now",datetime.datetime.now(tz=pytz.timezone('Asia/Kolkata')).strftime("%d-%B-%Y %H:%M:%S"))
         print("Thanks For Waiting")
