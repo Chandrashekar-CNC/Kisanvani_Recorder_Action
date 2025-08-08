@@ -457,7 +457,7 @@ def waitUntil(hh,mm):
     msg += "\nPresent Timestamp = "+str(s_stamp)
 
     diff = e_stamp-s_stamp
-    if (diff >= -500 and diff <= 0):
+    if (diff >= -500):
         print("Sleeping For [",e_stamp-s_stamp,"] Seconds")
         msg += "\n\nSleeping For [ "+str(e_stamp-s_stamp)+" ] Seconds..."
 
@@ -468,7 +468,7 @@ def waitUntil(hh,mm):
         m_id = mids['waitUntil']
         #---------------
 
-        if (diff >= -500):
+        if (diff >= -500 and diff <= 0):
             diff = 1
         time.sleep(diff)
         print("Now",datetime.datetime.now(tz=pytz.timezone('Asia/Kolkata')).strftime("%d-%B-%Y %H:%M:%S"))
