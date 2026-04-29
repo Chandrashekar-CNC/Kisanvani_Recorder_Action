@@ -69,13 +69,7 @@ jobs:
 
       - name: Send Wake-up Notification
         run: |
-          python telegram.py "
-🚀 <b>Kisanvani Daily Recorder</b>
-
-🕒 <b>Time:</b> ${{ steps.timecheck.outputs.ist_time }} IST
-📡 <b>Trigger:</b> ${{ github.event_name }}
-${{ github.event_name == 'workflow_dispatch' && format('📝 Reason: {0}', inputs.reason) || '' }}
-          "
+          python telegram.py "🚀 <b>Kisanvani Daily Recorder</b>🕒 <b>Time:</b> ${{ steps.timecheck.outputs.ist_time }} IST 📡 <b>Trigger:</b> ${{ github.event_name }} ${{ github.event_name == 'workflow_dispatch' && format('📝 Reason: {0}', inputs.reason) || '' }}"
         env:
           CNC_CH_ID: ${{ secrets.CNC_CH_ID }}
           CHATHUR_BOT: ${{ secrets.CHATHUR_BOT }}
@@ -124,12 +118,7 @@ ${{ github.event_name == 'workflow_dispatch' && format('📝 Reason: {0}', input
       - name: Skip - Outside Time Window
         if: steps.timecheck.outputs.in_window != 'true'
         run: |
-          python telegram.py "
-❌ <b>Kisanvani Recorder Skipped</b>
-
-🕒 <b>Time:</b> ${{ steps.timecheck.outputs.ist_time }} IST
-📛 <b>Reason:</b> Outside allowed time window
-✅ Allowed Window: 6:00 PM - 6:30 PM IST
+          python telegram.py "❌ <b>Kisanvani Recorder Skipped</b> 🕒 <b>Time:</b> ${{ steps.timecheck.outputs.ist_time }} IST 📛 <b>Reason:</b> Outside allowed time window ✅ Allowed Window: 6:00 PM - 6:30 PM IST
           "
         env:
           CNC_CH_ID: ${{ secrets.CNC_CH_ID }}
@@ -140,10 +129,9 @@ ${{ github.event_name == 'workflow_dispatch' && format('📝 Reason: {0}', input
         if: steps.already_ran.outputs.already_ran == 'true'
         run: |
           python telegram.py "
-⏭️ <b>Kisanvani Recorder Skipped</b>
-
-🕒 <b>Time:</b> ${{ steps.timecheck.outputs.ist_time }} IST
-📛 <b>Reason:</b> Already ran successfully today
+              ⏭️ <b>Kisanvani Recorder Skipped</b>
+              🕒 <b>Time:</b> ${{ steps.timecheck.outputs.ist_time }} IST
+              📛 <b>Reason:</b> Already ran successfully today
           "
         env:
           CNC_CH_ID: ${{ secrets.CNC_CH_ID }}
@@ -168,11 +156,10 @@ ${{ github.event_name == 'workflow_dispatch' && format('📝 Reason: {0}', input
         if: success() && steps.timecheck.outputs.in_window == 'true' && steps.already_ran.outputs.already_ran != 'true'
         run: |
           python telegram.py "
-✅ <b>Kisanvani Daily Recording Completed Successfully</b>
-
-🕒 <b>Completed at:</b> ${{ steps.timecheck.outputs.ist_time }} IST
-📡 <b>Trigger:</b> ${{ github.event_name }}
-🎯 <b>Status:</b> Success
+          ✅ <b>Kisanvani Daily Recording Completed Successfully</b>
+          🕒 <b>Completed at:</b> ${{ steps.timecheck.outputs.ist_time }} IST
+          📡 <b>Trigger:</b> ${{ github.event_name }}
+          🎯 <b>Status:</b> Success
           "
         env:
           CNC_CH_ID: ${{ secrets.CNC_CH_ID }}
