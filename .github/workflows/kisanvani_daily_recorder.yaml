@@ -61,7 +61,10 @@ jobs:
 
       - name: Send Wake-up Notification
         run: |
-          python telegram.py "🚀 <b>Kisanvani Daily Recorder</b><br>🕒 <b>Time:</b> ${{ steps.timecheck.outputs.ist_time }} IST<br>📡 <b>Trigger:</b> ${{ github.event_name }}"
+          python telegram.py "🚀 <b>Kisanvani Daily Recorder</b>
+          
+          🕒 <b>Time:</b> ${{ steps.timecheck.outputs.ist_time }} IST
+          📡 <b>Trigger:</b> ${{ github.event_name }}"
         env:
           CNC_CH_ID: ${{ secrets.CNC_CH_ID }}
           CHATHUR_BOT: ${{ secrets.CHATHUR_BOT }}
@@ -72,7 +75,11 @@ jobs:
         if: steps.timecheck.outputs.in_window != 'true'
         run: |
           echo "❌ Outside allowed time window (6:00 PM - 6:30 PM IST)"
-          python telegram.py "❌ <b>Kisanvani Recorder Failed</b><br>🕒 <b>Time:</b> ${{ steps.timecheck.outputs.ist_time }} IST<br>📛 <b>Reason:</b> Outside allowed time window<br>✅ Allowed: 6:00PM - 6:30PM IST"
+          python telegram.py "❌ <b>Kisanvani Recorder Failed</b>
+          
+          🕒 <b>Time:</b> ${{ steps.timecheck.outputs.ist_time }} IST
+          📛 <b>Reason:</b> Outside allowed time window
+          ✅ Allowed: 6:00PM - 6:30PM IST"
         env:
           CNC_CH_ID: ${{ secrets.CNC_CH_ID }}
           CHATHUR_BOT: ${{ secrets.CHATHUR_BOT }}
@@ -110,7 +117,10 @@ jobs:
         if: steps.already_ran.outputs.already_ran == 'true'
         run: |
           echo "⏭️ Main recording already completed today"
-          python telegram.py "⏭️ <b>Kisanvani Recorder Skipped</b><br>🕒 <b>Time:</b> ${{ steps.timecheck.outputs.ist_time }} IST<br>📛 <b>Reason:</b> Already recorded successfully today"
+          python telegram.py "⏭️ <b>Kisanvani Recorder Skipped</b>
+          
+          🕒 <b>Time:</b> ${{ steps.timecheck.outputs.ist_time }} IST
+          📛 <b>Reason:</b> Already recorded successfully today"
         env:
           CNC_CH_ID: ${{ secrets.CNC_CH_ID }}
           CHATHUR_BOT: ${{ secrets.CHATHUR_BOT }}
@@ -132,7 +142,10 @@ jobs:
       - name: Send Success Notification
         if: success() && steps.timecheck.outputs.in_window == 'true' && steps.already_ran.outputs.already_ran != 'true'
         run: |
-          python telegram.py "✅ <b>Kisanvani Daily Recording Completed Successfully</b><br>🕒 <b>Completed at:</b> ${{ steps.timecheck.outputs.ist_time }} IST<br>📡 <b>Trigger:</b> ${{ github.event_name }}"
+          python telegram.py "✅ <b>Kisanvani Daily Recording Completed Successfully</b>
+          
+          🕒 <b>Completed at:</b> ${{ steps.timecheck.outputs.ist_time }} IST
+          📡 <b>Trigger:</b> ${{ github.event_name }}"
         env:
           CNC_CH_ID: ${{ secrets.CNC_CH_ID }}
           CHATHUR_BOT: ${{ secrets.CHATHUR_BOT }}
