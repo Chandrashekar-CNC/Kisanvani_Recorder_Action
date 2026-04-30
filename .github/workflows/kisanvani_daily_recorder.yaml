@@ -1,0 +1,139 @@
+name: Kisanvani Daily Recorder (6:00-6:30 PM IST)
+
+on:
+  schedule:
+    - cron: '00 12 * * *'
+      timezone: 'Asia/Kolkata'
+
+  workflow_dispatch:
+    inputs:
+      reason:
+        description: 'Reason for manual trigger'
+        required: false
+        default: 'External backup trigger'
+
+concurrency:
+  group: kisanvani-daily-recorder
+  cancel-in-progress: false
+
+jobs:
+  daily-recorder:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: 3.8
+
+      - name: Install Dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ffmpeg
+          pip install beautifulsoup4 requests internetarchive pytz fpdf
+
+      # ==================== WAKE UP ====================
+      - name: Wake-up Log
+        run: |
+          echo "🚀 Kisanvani Daily Recorder Started"
+          echo "Trigger : ${{ github.event_name }}"
+
+      - name: Check Current IST Time
+        id: timecheck
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const now = new Date();
+            const istOffset = 5.5 * 60 * 60 * 1000;
+            const istTime = new Date(now.getTime() + istOffset);
+            
+            const hours = istTime.getUTCHours();
+            const minutes = istTime.getUTCMinutes();
+            const currentTimeStr = `${hours.toString().padStart(2,'0')}:${minutes.toString().padStart(2,'0')}`;
+            
+            const isInWindow = (hours === 18 && minutes >= 0 && minutes <= 30);
+            
+            core.setOutput('in_window', isInWindow);
+            core.setOutput('ist_time', currentTimeStr);
+
+      - name: Send Wake-up Notification
+        run: |
+          python telegram.py "🚀 <b>Kisanvani Daily Recorder</b>%0A%0A🕒 <b>Time:</b> ${{ steps.timecheck.outputs.ist_time }} IST%0A📡 <b>Trigger:</b> ${{ github.event_name }}"
+        env:
+          CNC_CH_ID: ${{ secrets.CNC_CH_ID }}
+          CHATHUR_BOT: ${{ secrets.CHATHUR_BOT }}
+        continue-on-error: true
+
+      # ==================== TIME WINDOW CHECK ====================
+      - name: Skip - Outside Time Window (Mark as Failed)
+        if: steps.timecheck.outputs.in_window != 'true'
+        run: |
+          echo "❌ Outside allowed time window (6:00 PM - 6:30 PM IST)"
+          python telegram.py "❌ <b>Kisanvani Recorder Failed</b>%0A%0A🕒 <b>Time:</b> ${{ steps.timecheck.outputs.ist_time }} IST%0A📛 <b>Reason:</b> Outside allowed time window%0A✅ Allowed: 18:00 - 18:30 IST"
+        env:
+          CNC_CH_ID: ${{ secrets.CNC_CH_ID }}
+          CHATHUR_BOT: ${{ secrets.CHATHUR_BOT }}
+        continue-on-error: true
+
+      - name: Fail Job if Outside Time Window
+        if: steps.timecheck.outputs.in_window != 'true'
+        run: exit 1
+
+      # ==================== ALREADY RAN CHECK (Only inside window) ====================
+      - name: Check if Main Recording Already Ran Today
+        id: already_ran
+        if: steps.timecheck.outputs.in_window == 'true'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const today = new Date().toISOString().split('T')[0];
+            
+            const runs = await github.rest.actions.listWorkflowRuns({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              workflow_id: 'kisanvani_daily_recorder.yaml',
+              status: 'completed',
+              per_page: 8
+            });
+
+            const alreadyRanToday = runs.data.workflow_runs.some(run => {
+              const runDate = new Date(run.created_at).toISOString().split('T')[0];
+              return runDate === today && run.conclusion === 'success';
+            });
+
+            core.setOutput('already_ran', alreadyRanToday);
+
+      - name: Skip - Already Ran Today
+        if: steps.already_ran.outputs.already_ran == 'true'
+        run: |
+          echo "⏭️ Main recording already completed today"
+          python telegram.py "⏭️ <b>Kisanvani Recorder Skipped</b>%0A%0A🕒 <b>Time:</b> ${{ steps.timecheck.outputs.ist_time }} IST%0A📛 <b>Reason:</b> Already recorded successfully today"
+        env:
+          CNC_CH_ID: ${{ secrets.CNC_CH_ID }}
+          CHATHUR_BOT: ${{ secrets.CHATHUR_BOT }}
+        continue-on-error: true
+
+      # ==================== MAIN RECORDING ====================
+      - name: Run Main Recording Script
+        if: steps.timecheck.outputs.in_window == 'true' && steps.already_ran.outputs.already_ran != 'true'
+        run: python ka_radio_github.py city10
+        env:
+          KISANVANI_CH_ID: ${{ secrets.KISANVANI_CH_ID }}
+          CNC_CH_ID: ${{ secrets.CNC_CH_ID }}
+          FORMER_RADIO_BOT: ${{ secrets.FORMER_RADIO_BOT }}
+          CHATHUR_BOT: ${{ secrets.CHATHUR_BOT }}
+          access_key: ${{ secrets.access_key }}
+          secret_key: ${{ secrets.secret_key }}
+        timeout-minutes: 80
+
+      - name: Send Success Notification
+        if: success() && steps.timecheck.outputs.in_window == 'true' && steps.already_ran.outputs.already_ran != 'true'
+        run: |
+          python telegram.py "✅ <b>Kisanvani Daily Recording Completed Successfully</b>%0A%0A🕒 <b>Completed at:</b> ${{ steps.timecheck.outputs.ist_time }} IST%0A📡 <b>Trigger:</b> ${{ github.event_name }}"
+        env:
+          CNC_CH_ID: ${{ secrets.CNC_CH_ID }}
+          CHATHUR_BOT: ${{ secrets.CHATHUR_BOT }}
+        continue-on-error: true
