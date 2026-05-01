@@ -24,6 +24,20 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v4
 
+        # === ONE PING AT THE START (as you wanted) ===
+      - name: Ping Healthchecks - Start + Success
+        id: healthcheck_ping
+        run: |
+          echo "Sending ping to Healthchecks at $(date)"
+          
+          # Send /start followed immediately by success ping
+          curl -fsS -m 10 --retry 5 "${{ secrets.HEALTHCHECKS_URL }}/start"
+          sleep 2
+          curl -fsS -m 10 --retry 5 "${{ secrets.HEALTHCHECKS_URL }}"
+          
+          echo "Healthchecks ping sent successfully."
+        continue-on-error: true
+
       - name: Setup Python
         uses: actions/setup-python@v4
         with:
