@@ -52,9 +52,11 @@ jobs:
       # ==================== WAKE UP ====================
       - name: Wake-up Log
         run: |
-          echo "🚀 Kisanvani Daily Recorder Started"
+          echo "🚀 Kisanvani Recorder Started"
           echo "Trigger : ${{ github.event_name }}"
-
+          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+              echo "Reason      : ${{ inputs.reason }}"
+          fi
       - name: Check Current IST Time
         id: timecheck
         uses: actions/github-script@v7
