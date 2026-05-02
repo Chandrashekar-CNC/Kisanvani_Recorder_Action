@@ -80,7 +80,8 @@ jobs:
           python telegram.py "🚀 <b>Kisanvani Daily Recorder</b>
           
           🕒 <b>Time:</b> ${{ steps.timecheck.outputs.ist_time }} IST
-          📡 <b>Trigger:</b> ${{ github.event_name }}"
+          📡 <b>Trigger:</b> ${{ github.event_name }}
+          📛 <b>Reason:</b> ${{ inputs.reason }}"
         env:
           CNC_CH_ID: ${{ secrets.CNC_CH_ID }}
           CHATHUR_BOT: ${{ secrets.CHATHUR_BOT }}
