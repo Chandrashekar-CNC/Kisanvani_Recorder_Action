@@ -1,4 +1,4 @@
-name: Kisanvani Daily Recorder (6:00-6:30 PM IST)
+name: Kisanvani Daily Recorder (6:50-7:30 PM IST)
 
 on:
   schedule:
@@ -70,7 +70,7 @@ jobs:
             const minutes = istTime.getUTCMinutes();
             const currentTimeStr = `${hours.toString().padStart(2,'0')}:${minutes.toString().padStart(2,'0')}`;
             
-            const isInWindow = (hours === 18 && minutes >= 0 && minutes <= 30);
+            const isInWindow = (hours === 18 && minutes >= 30 && minutes <= 50);
             
             core.setOutput('in_window', isInWindow);
             core.setOutput('ist_time', currentTimeStr);
@@ -91,12 +91,12 @@ jobs:
       - name: Skip - Outside Time Window (Mark as Failed)
         if: steps.timecheck.outputs.in_window != 'true'
         run: |
-          echo "❌ Outside allowed time window (6:00 PM - 6:30 PM IST)"
+          echo "❌ Outside allowed time window (6:30 PM - 6:50 PM IST)"
           python telegram.py "❌ <b>Kisanvani Recorder Failed</b>
           
           🕒 <b>Time:</b> ${{ steps.timecheck.outputs.ist_time }} IST
-          📛 <b>Reason:</b> Outside allowed time window
-          ✅ Allowed: 6:00PM - 6:30PM IST"
+          📛 <b>Reason:</b> Outside allowed time
+          ✅ Allowed: 6:30PM - 6:50PM IST"
         env:
           CNC_CH_ID: ${{ secrets.CNC_CH_ID }}
           CHATHUR_BOT: ${{ secrets.CHATHUR_BOT }}
@@ -162,7 +162,8 @@ jobs:
           python telegram.py "✅ <b>Kisanvani Daily Recording Completed Successfully</b>
           
           🕒 <b>Completed at:</b> ${{ steps.timecheck.outputs.ist_time }} IST
-          📡 <b>Trigger:</b> ${{ github.event_name }}"
+          📡 <b>Trigger:</b> ${{ github.event_name }}
+          📛 <b>Reason:</b> ${{ inputs.reason }}"
         env:
           CNC_CH_ID: ${{ secrets.CNC_CH_ID }}
           CHATHUR_BOT: ${{ secrets.CHATHUR_BOT }}
