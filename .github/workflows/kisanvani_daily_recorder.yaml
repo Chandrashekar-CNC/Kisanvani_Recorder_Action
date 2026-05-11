@@ -1,9 +1,9 @@
 name: Kisanvani Daily Recorder (6:50-7:30 PM IST)
 
 on:
-  schedule:
-    - cron: '00 12 * * *'
-      timezone: 'Asia/Kolkata'
+  #schedule:
+    #- cron: '00 12 * * *'
+      #timezone: 'Asia/Kolkata'
 
   workflow_dispatch:
     inputs:
