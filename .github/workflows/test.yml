@@ -1,5 +1,6 @@
 name: Get Usage Minutes
-
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24=true
 on:
   workflow_dispatch: # Allows manual triggering
   #schedule:
