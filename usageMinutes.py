@@ -5,7 +5,7 @@ from datetime import datetime
 
 
 # ================== CONFIGURATION ==================
-TOKEN = os.environ.get('GITHUB_MINUTES')
+TOKEN = os.environ.get('USAGE_MINUTES')
 USERNAME = "chandrashekar-cnc" # ← Your GitHub username
 CHANNEL_ID = os.environ.get('CNC_CH_ID')
 BOT_TOKEN = os.environ.get('CHATHUR_BOT')
