@@ -168,11 +168,21 @@ jobs:
           CNC_CH_ID: ${{ secrets.CNC_CH_ID }}
           CHATHUR_BOT: ${{ secrets.CHATHUR_BOT }}
         continue-on-error: true
-
+     
+      - name: Send Github usage stats
+        if: always()  # Optional: Ensures stats send even if previous steps skip or fail
+        env:
+          CNC_CH_ID: ${{ secrets.CNC_CH_ID }}
+          CHATHUR_BOT: ${{ secrets.CHATHUR_BOT }}
+          USAGE_MINUTES: ${{ secrets.USAGE_MINUTES }}
+        run: |
+          python usageMinutes.py
+        continue-on-error: true
+        
       - name: Send Github usage stats
         run: |
           python usageMinutes.py
-          env:
+        env:
           CNC_CH_ID: ${{ secrets.CNC_CH_ID }}
           CHATHUR_BOT: ${{ secrets.CHATHUR_BOT }}
           USAGE_MINUTES: ${{ secrets.USAGE_MINUTES }}
