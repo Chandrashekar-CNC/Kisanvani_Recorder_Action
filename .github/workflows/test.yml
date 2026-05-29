@@ -2,8 +2,8 @@ name: Get Usage Minutes
 
 on:
   workflow_dispatch: # Allows manual triggering
-  schedule:
-    - cron: '0 0 * * *' # Optional: Runs daily
+  #schedule:
+    #- cron: '0 0 * * *' # Optional: Runs daily
 
 jobs:
   run-script:
