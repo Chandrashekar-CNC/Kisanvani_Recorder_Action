@@ -164,7 +164,7 @@ def parse_for_telegram(data):
     for product_name, skus in grouped_data.items():
         # Line max: 35 chars
         telegram_message += "===================================\n"
-        telegram_message += f"PROD: {product_name.upper()}\n"
+        telegram_message += f"PRODUCT: {product_name.upper()}\n"
         telegram_message += "===================================\n"
         
         for sku_name, monthly_records in skus.items():
@@ -193,9 +193,9 @@ def parse_for_telegram(data):
 
             telegram_message += " . . . . . . . . . . . . . . . . . \n"
             # SKU aggregated totals
-            telegram_message += f" TOT: {total_used:.2f} {unit_type}\n"
-            telegram_message += f" COST: ${total_cost:.4f}\n"
-            telegram_message += f" NET:  ${net_amount:.4f}\n"
+            telegram_message += f" TOTAL Hr   : {total_used:.2f} {unit_type}\n"
+            telegram_message += f" TOTAL COST : ${total_cost:.4f}\n"
+            telegram_message += f" NET AMOUNT :  ${net_amount:.4f}\n"
             telegram_message += "===================================\n"
 
         telegram_message += "\n"
