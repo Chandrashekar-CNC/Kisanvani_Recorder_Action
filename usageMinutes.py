@@ -1,11 +1,10 @@
-
 import json, requests, os
 from collections import defaultdict
 from datetime import datetime
 
 
 # ================== CONFIGURATION ==================
-TOKEN = os.environ.get('USAGE_MINUTES')
+TOKEN = os.environ.get('GITHUB_MINUTES')
 USERNAME = "chandrashekar-cnc" # ← Your GitHub username
 CHANNEL_ID = os.environ.get('CNC_CH_ID')
 BOT_TOKEN = os.environ.get('CHATHUR_BOT')
@@ -139,46 +138,70 @@ def parse_for_telegram(data):
         print("No usage data found.")
         return
 
-    # Build the nested grouping structure: Product -> SKU -> Month Data
-    # Using a lambda function to construct a multi-layered dictionary automatically
+    # Build the nested grouping structure
     grouped_data = defaultdict(lambda: defaultdict(list))
 
     for item in data['usageItems']:
         product = item['product']
         sku = item['sku']
 
-        # Parse the raw date string and convert it into a 'YYYY-MM' format
         date_obj = datetime.strptime(item['date'], '%Y-%m-%dT%H:%M:%SZ')
         month_str = date_obj.strftime('%Y-%m')
 
-        # Extract data fields for easier reporting
+        # Keep values as numbers for accurate summation
         monthly_entry = {
             'month': month_str,
-            'used': str(item['quantity']).replace(".0",""),
+            'used': item['quantity'],
             'unit': item['unitType'].replace("Minutes","Min").replace("GigabyteHours","GB Hr").replace("Hours","Hr"),
-            'cost': item['grossAmount'],  # using grossAmount for your cost
+            'cost': item['grossAmount'],
             'net': item['netAmount']
         }
-
-        # Append the extracted row into our nested structure
         grouped_data[product][sku].append(monthly_entry)
 
-    telegram_message = ""
-    # 3. Iterate through the grouped data to display the formatting you requested
+    # Use HTML <pre> tag for fixed-width layout in Telegram
+    telegram_message = "<pre>"
+    
     for product_name, skus in grouped_data.items():
-        telegram_message += "------------------------------\n"
-        telegram_message += product_name.upper()+"\n"
-        telegram_message += "------------------------------\n"
+        # Line max: 35 chars
+        telegram_message += "===================================\n"
+        telegram_message += f"PROD: {product_name.upper()}\n"
+        telegram_message += "===================================\n"
+        
         for sku_name, monthly_records in skus.items():
-            telegram_message += f"-> {sku_name}\n"
+            # Truncate or fit SKU name gracefully within line limits
+            telegram_message += f"→ {sku_name[:31]}\n"
+            telegram_message += "-----------------------------------\n"
+
+            total_used = 0
+            total_cost = 0
+            net_amount = 0
+            unit_type = ""
+
             for record in monthly_records:
-                t = f"      {record['month']:<9}{record['used']:<110}\n"
-                telegram_message += t
-            telegram_message += f"      NET AMOUNT $0.00\n"
+                unit_type = record['unit']
+                total_used += record['used']
+                total_cost += record['cost']
+                net_amount += record['net']
 
+                # Format metrics to fit 35-char limit
+                # Line 1: Month & Usage quantity (e.g., "2026-05: 1466.00 Min")
+                line1 = f" {record['month']}: {record['used']:.2f} {unit_type} "
+                # Line 2: Cost summary (e.g., "         Cost: $8.7960")
+                line2 = f" ${record['cost']:.4f}\n"
+
+                telegram_message += line1 + line2
+
+            telegram_message += " . . . . . . . . . . . . . . . . . \n"
+            # SKU aggregated totals
+            telegram_message += f" TOT: {total_used:.2f} {unit_type}\n"
+            telegram_message += f" COST: ${total_cost:.4f}\n"
+            telegram_message += f" NET:  ${net_amount:.4f}\n"
+            telegram_message += "===================================\n"
+
+        telegram_message += "\n"
+
+    telegram_message += "</pre>"
     return telegram_message
-    #send_telegram_text_message(telegram_message)
-
 
 if __name__ == "__main__":
     data = get_actions_usage()
@@ -186,4 +209,3 @@ if __name__ == "__main__":
     if data:
         parse_and_display(data)
         send_telegram_text_message(parse_for_telegram(data))
-
