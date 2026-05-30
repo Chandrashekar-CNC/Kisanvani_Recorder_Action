@@ -193,7 +193,7 @@ def parse_for_telegram(data):
 
             telegram_message += " . . . . . . . . . . . . . . . . . \n"
             # SKU aggregated totals
-            telegram_message += f" TOTAL Hr   : {total_used:.2f} {unit_type}\n"
+            telegram_message += f" TOTAL USED : {total_used:.2f} {unit_type}\n"
             telegram_message += f" TOTAL COST : ${total_cost:.4f}\n"
             telegram_message += f" NET AMOUNT :  ${net_amount:.4f}\n"
             telegram_message += "===================================\n"
